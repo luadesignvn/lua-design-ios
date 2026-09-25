@@ -18,6 +18,11 @@ workflows:
           set -eu
           test -s www/index.html
           test -s www/assets/native-preview.js
+          test -s www/assets/native-onboarding.css
+          test -s plugins/lua-d1-wifi/LuaD1Wifi.podspec
+          test -s plugins/lua-d1-wifi/Package.swift
+          test -s plugins/lua-d1-wifi/ios/Sources/LuaD1WifiPlugin/LuaD1WifiPlugin.swift
+          test -s scripts/configure_ios_d1.py
           test -s www/assets/controller-20260716a.css
           test -s www/assets/capacitor-ios.css
           test -s www/assets/qr-vendor-20260715a.js
@@ -30,6 +35,15 @@ workflows:
           else
             npx cap add ios
           fi
+      - name: Configure iOS Hotspot entitlement and local network privacy
+        script: |
+          set -eu
+          python3 scripts/configure_ios_d1.py
+          npx cap ls ios | tee /tmp/lua-ios-plugins.txt
+          grep -q '@luadesign/capacitor-d1-wifi' /tmp/lua-ios-plugins.txt || {
+            echo 'ERROR: LuaD1Wifi plugin was not discovered by Capacitor.'
+            exit 1
+          }
       - name: Build unsigned iOS app
         script: |
           set -eu

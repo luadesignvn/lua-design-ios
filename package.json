@@ -12,7 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "@capacitor/core": "^8.5.2",
-    "@capacitor/ios": "^8.5.2"
+    "@capacitor/ios": "^8.5.2",
+    "@luadesign/capacitor-d1-wifi": "file:plugins/lua-d1-wifi"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.2"

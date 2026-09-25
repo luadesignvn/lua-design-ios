@@ -1,0 +1,67 @@
+/* Lua Design native onboarding shell.
+   Safe preview: JS will control visibility, state and button enablement in the next step. */
+.native-device-switcher-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.native-add-device-btn { white-space:nowrap; }
+.native-empty-state { text-align:center; padding:clamp(24px,5vw,56px) 20px; }
+.native-empty-state-icon { display:flex; align-items:center; justify-content:center; margin:0 auto 16px; height:76px; width:76px; border-radius:22px; font-size:40px; color:#2563eb; background:#eff6ff; }
+.native-empty-state h1 { font-size:clamp(22px,4vw,29px); margin:0 0 12px; }
+.native-empty-state p { max-width:560px; margin:0 auto 22px; line-height:1.6; }
+.native-main-cta { min-height:50px; }
+.native-muted { color:#64748b; font-size:14px; line-height:1.55; }
+.native-empty-state .native-muted { margin-top:18px; }
+.native-dialog-backdrop { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:1100; background:rgba(15,23,42,.62); padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom)); }
+.native-dialog-backdrop.hidden, .native-setup-panel.hidden { display:none !important; }
+.native-dialog-card { box-sizing:border-box; width:min(100%,540px); max-height:calc(100dvh - 34px); overflow:auto; background:#fff; color:#111827; border-radius:20px; box-shadow:0 18px 60px rgba(15,23,42,.24); padding:22px; }
+.native-dialog-header, .native-subheading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.native-dialog-header { margin-bottom:12px; }
+.native-dialog-header h2 { margin:0; font-size:23px; }
+.native-dialog-close { min-width:42px; min-height:42px; }
+.native-device-choices { display:grid; gap:12px; }
+.native-choice { width:100%; background:#fff; text-align:left; display:grid; grid-template-columns:45px 1fr 18px; gap:12px; align-items:center; color:#142139; border:1px solid #d6e1f0; border-radius:14px; padding:14px; font:inherit; }
+.native-choice-icon { font-size:28px; }
+.native-choice strong, .native-choice small { display:block; }
+.native-choice strong { font-size:16px; margin-bottom:5px; }
+.native-choice small { font-size:13px; color:#64748b; line-height:1.45; }
+.native-choice:disabled, .native-dialog-card button:disabled { opacity:.68; cursor:not-allowed; }
+.native-choice:not(:disabled):active { background:#eff6ff; }
+.native-setup-panel h3 { font-size:19px; margin:10px 0; }
+.native-setup-steps { margin:12px 0 20px; padding-left:22px; color:#475569; line-height:1.55; font-size:14px; }
+.native-setup-steps li+li { margin-top:6px; }
+.native-form-label { display:block; font-weight:600; font-size:14px; margin:14px 0 7px; }
+.native-form-input { box-sizing:border-box; display:block; width:100%; min-height:45px; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; background:#fff; color:#0f172a; font-size:16px; }
+.native-full-btn { width:100%; min-height:46px; margin-top:12px; }
+.native-subheading { margin-bottom:9px; }
+.native-wifi-list-section { margin-top:22px; }
+.native-wifi-list { min-height:58px; border-radius:10px; background:#f8fafc; padding:12px; }
+.native-wifi-list p { margin:0; }
+@media(max-width:540px) { .native-device-switcher-heading { align-items:stretch; } .native-add-device-btn { width:100%; } .native-dialog-backdrop { align-items:flex-end; padding:0; } .native-dialog-card { max-height:92dvh; width:100%; border-radius:22px 22px 0 0; padding-bottom:max(22px,env(safe-area-inset-bottom)); } }
+
+/* v2 preview wiring: demo-only state, accessible dialog, safe-area layout. */
+.native-sample-toggle { margin-top: 8px; border: 1px solid #cbd5e1; color:#1d4ed8; background:#fff; }
+.native-sample-notice { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; border-color:#93c5fd; background:#eff6ff; }
+.native-sample-notice strong { color:#1e40af; }
+.native-sample-notice p { margin:5px 0 0; color:#475569; font-size:14px; }
+.native-sample-notice .native-sample-toggle { margin:0; }
+.native-dialog-header h2 { flex:1; }
+.native-dialog-back { font-size:28px; min-width:42px; min-height:42px; }
+.native-dialog-back.hidden { display:none !important; }
+.native-setup-preview-flag { display:inline-block; font-weight:700; font-size:12px; color:#92400e; background:#ffedd5; padding:5px 11px; border-radius:999px; margin:8px 0 2px; }
+.native-wifi-help { margin:8px 0 0; font-size:13px; }
+.native-modal-open { overflow:hidden !important; }
+.native-form-input:disabled { background:#f1f5f9; color:#64748b; }
+.native-add-device-btn:focus-visible, .native-choice:focus-visible, .native-dialog-close:focus-visible, .native-main-cta:focus-visible { outline:3px solid #60a5fa; outline-offset:3px; }
+@media(max-width:540px) { .native-sample-notice .native-sample-toggle { width:100%; } }
+.native-sample-toggle { min-height:44px; padding:10px 14px; border-radius:10px; }
+
+/* Native Wi-Fi provisioning: preserve the current on-device HTML as fallback only. */
+.native-ap-resolved { margin:6px 0 0; overflow-wrap:anywhere; font-size:13px; }
+.native-network { display:flex; align-items:center; gap:10px; width:100%; padding:13px 11px; border:1px solid #cbd5e1; background:#fff; border-radius:10px; margin:6px 0; color:#142139; text-align:left; font:inherit; cursor:pointer; }
+.native-network[aria-checked="true"] { border-color:#2563eb; box-shadow:inset 0 0 0 1px #2563eb; background:#eff6ff; }
+.native-network .native-network-main { flex:1; min-width:0; overflow-wrap:anywhere; }
+.native-network .native-network-main strong,.native-network .native-network-main small { display:block; }
+.native-network .native-network-main small { color:#64748b; font-size:12px; margin-top:3px; }
+.native-network .native-network-mark { font-size:18px; width:22px; }
+.native-network:focus-visible { outline:3px solid #60a5fa; outline-offset:1px; }
+.native-legacy-risk { display:flex; gap:10px; align-items:flex-start; background:#fffbeb; color:#854d0e; border:1px solid #fcd34d; border-radius:12px; padding:12px; margin:16px 0 0; font-size:13px; line-height:1.55; }
+.native-legacy-risk input { flex-shrink:0; margin-top:3px; width:18px; height:18px; }
+.native-wifi-list:empty::after { content:'Không tìm thấy mạng Wi-Fi'; font-size:14px; color:#64748b; }

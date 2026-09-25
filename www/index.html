@@ -6,13 +6,14 @@
   <title>Lúa Design</title>
 
   <meta name="theme-color" content="#f4f6fb" />
-  <meta name="lua-build" content="native-preview-offline" />
+  <meta name="lua-build" content="native-wifi-ios-v1" />
   <link rel="icon" type="image/png" sizes="512x512" href="./icons/LogoappXanh_512_20260515c.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Lúa Design" />
-    <link rel="stylesheet" href="./assets/controller-20260716a.css" />
+  <link rel="stylesheet" href="./assets/controller-20260716a.css" />
+  <link rel="stylesheet" href="./assets/native-onboarding.css" />
   <link rel="stylesheet" href="./assets/capacitor-ios.css" />
 </head>
 <body>
@@ -35,7 +36,13 @@
 
     <section class="card hidden device-switcher-card" id="deviceSwitcherCard">
       <div class="device-switcher">
-        <div class="device-switcher-label" id="deviceSwitcherLabel">Thiết bị của bạn</div>
+        <div class="native-device-switcher-heading">
+          <div class="device-switcher-label" id="deviceSwitcherLabel">Thiết bị của bạn</div>
+          <button class="btn primary native-add-device-btn" id="nativeAddDeviceBtn" type="button"
+                  aria-haspopup="dialog" aria-controls="nativeAddDeviceDialog" disabled>
+            + Thêm thiết bị
+          </button>
+        </div>
         <div class="device-switcher-wrap">
           <button
             class="btn device-switcher-btn"
@@ -51,6 +58,25 @@
           <div class="device-switcher-menu hidden" id="deviceSwitcherMenu" role="presentation"></div>
         </div>
       </div>
+    </section>
+
+    <!-- Trạng thái rỗng: chỉ hiện khi phiên native xác nhận không có thiết bị được cấp quyền.
+         Không hiển thị nút điều khiển hoặc lịch ở trạng thái này. -->
+    <section class="card native-empty-state hidden" id="nativeEmptyStateCard" aria-labelledby="nativeWelcomeTitle">
+      <div class="native-empty-state-icon" aria-hidden="true">▦</div>
+      <h1 id="nativeWelcomeTitle">Chào mừng đến với Lúa Design</h1>
+      <p id="nativeWelcomeDescription">Quét mã QR để thêm thiết bị đầu tiên, hoặc cấu hình Wi-Fi cho D1 mini mới.</p>
+      <button class="btn primary native-main-cta" id="nativeFirstDeviceBtn" type="button"
+              aria-haspopup="dialog" aria-controls="nativeAddDeviceDialog" disabled>
+        Quét QR / Thêm thiết bị
+      </button>
+      <p class="native-muted" id="nativeEmptyHint">Bản thử nghiệm hiện chưa kết nối backend, nên chưa thể tải danh sách thiết bị thật.</p>
+      <button class="btn native-sample-toggle" id="nativeEnterSampleBtn" type="button">Xem thử giao diện khi có thiết bị (demo)</button>
+    </section>
+
+    <section class="card native-sample-notice hidden" id="nativeSampleNotice" aria-label="Thông báo dữ liệu mẫu">
+      <div><strong id="nativeSampleNoticeTitle">Đang xem giao diện mẫu</strong><p id="nativeSampleNoticeText">Không có thiết bị thật. Các nút điều khiển, PWM và lịch đều bị vô hiệu hóa.</p></div>
+      <button class="btn native-sample-toggle" id="nativeLeaveSampleBtn" type="button">Quay lại màn hình thêm thiết bị</button>
     </section>
 
     <section class="card hidden" id="controlCard">
@@ -129,6 +155,77 @@
       </div>
     </section>
   </div>
+
+    <!-- Wi-Fi D1 uses native iOS NEHotspotConfiguration + local APIs. QR/native-auth
+         and all demo relay controls remain disabled until separately tested. -->
+    <section class="native-dialog-backdrop hidden" id="nativeAddDeviceDialog"
+             role="dialog" aria-modal="true" aria-labelledby="nativeAddDeviceTitle" aria-hidden="true">
+      <div class="native-dialog-card">
+        <div class="native-dialog-header">
+          <button class="btn native-dialog-back hidden" id="nativeDialogBackBtn" type="button" aria-label="Quay lại">‹</button>
+          <h2 id="nativeAddDeviceTitle">Thêm thiết bị</h2>
+          <button class="btn native-dialog-close" id="nativeCloseAddDeviceBtn" type="button" aria-label="Đóng">✕</button>
+        </div>
+        <div id="nativeAddDeviceChoices" class="native-device-choices">
+          <p class="native-muted">Chọn cách thêm thiết bị Lúa Design vào ứng dụng.</p>
+          <button class="native-choice" id="nativeStartWifiSetupBtn" type="button" disabled>
+            <span class="native-choice-icon" aria-hidden="true">📶</span>
+            <span><strong>Cài đặt Wi-Fi cho D1 mới</strong>
+              <small>Kết nối tạm thời với Wi-Fi AP của D1 và cấu hình mạng gia đình ngay trong app.</small>
+            </span>
+            <span aria-hidden="true">›</span>
+          </button>
+          <button class="native-choice" id="nativeStartQrScanBtn" type="button" disabled>
+            <span class="native-choice-icon" aria-hidden="true">▦</span>
+            <span><strong>Quét QR để ghép quyền</strong>
+              <small>Dùng QR owner hoặc QR chia sẻ khi thiết bị đã có kết nối Internet.</small>
+            </span>
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
+
+        <section id="nativeWifiSetupPanel" class="native-setup-panel hidden" aria-labelledby="nativeWifiSetupTitle">
+          <h3 id="nativeWifiSetupTitle">Cài đặt Wi-Fi D1 mini</h3>
+          <ol class="native-setup-steps">
+            <li>Kết nối iPhone với Wi-Fi AP của đúng D1 (iOS sẽ yêu cầu bạn xác nhận).</li>
+            <li>Chọn Wi-Fi gia đình từ danh sách D1 tự quét và nhập mật khẩu.</li>
+            <li>Kiểm tra D1 đã trực tuyến, sau đó quét QR để ghép quyền nếu cần.</li>
+          </ol>
+          <label class="native-form-label" for="nativeD1SsidInput">Mã 6 ký tự hoặc tên Wi-Fi AP của D1</label>
+          <input id="nativeD1SsidInput" class="native-form-input" type="text"
+                 placeholder="Ví dụ A1B2C3" maxlength="32" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <p id="nativeApResolved" class="native-muted native-ap-resolved" aria-live="polite"></p>
+          <button class="btn primary native-full-btn" id="nativeConnectD1ApBtn" type="button" disabled>Kết nối với D1</button>
+          <p id="nativeD1Identity" class="native-muted" aria-live="polite"></p>
+          <div class="native-wifi-list-section">
+            <div class="native-subheading">
+              <strong>Wi-Fi gia đình</strong>
+              <button class="btn small" id="nativeRescanWifiBtn" type="button" disabled>Quét lại</button>
+            </div>
+            <div id="nativeWifiNetworkList" class="native-wifi-list" role="radiogroup" aria-label="Danh sách Wi-Fi D1 quét được">
+              <p class="native-muted">Danh sách mạng sẽ hiển thị sau khi app kết nối tới AP và xác minh đúng D1.</p>
+            </div>
+          </div>
+          <label class="native-form-label" for="nativeHomeWifiPassword">Mật khẩu Wi-Fi đã chọn</label>
+          <input id="nativeHomeWifiPassword" class="native-form-input" type="password"
+                 autocomplete="off" spellcheck="false" placeholder="Nhập mật khẩu Wi-Fi" />
+          <label class="native-legacy-risk"><input id="nativeConfirmOpenApRisk" type="checkbox" />
+            <span>Đây là bản thử nghiệm: D1 hiện dùng AP mở và API HTTP GET để nhận mật khẩu Wi-Fi. Tôi đang ở nơi tin cậy và đồng ý cấu hình trên thiết bị của mình.</span>
+          </label>
+          <button class="btn primary native-full-btn" id="nativeSaveD1WifiBtn" type="button" disabled>Lưu và kết nối</button>
+          <p class="native-muted" id="nativeWifiSetupStatus" role="status" aria-live="polite">
+            Chưa kết nối AP. Không lưu mật khẩu Wi-Fi vào bộ nhớ lâu dài của app.
+          </p>
+        </section>
+
+        <section id="nativeQrPairPanel" class="native-setup-panel hidden" aria-labelledby="nativeQrPairTitle">
+          <h3 id="nativeQrPairTitle">Quét QR để ghép thiết bị</h3>
+          <p class="native-muted">Dùng camera iPhone quét QR owner hoặc QR chia sẻ. App sẽ chỉ hiển thị thiết bị sau khi backend cấp quyền thành công.</p>
+          <button class="btn primary native-full-btn" id="nativeLaunchQrCameraBtn" type="button" disabled>Mở camera quét QR</button>
+          <p class="native-muted" id="nativeQrPairStatus" role="status" aria-live="polite">Chức năng sẽ được bật sau khi tích hợp native auth và camera.</p>
+        </section>
+      </div>
+    </section>
 
   <section id="a2hsOverlay" class="a2hs-overlay" aria-hidden="true">
     <div class="a2hs-card" role="dialog" aria-modal="true" aria-label="Add to Home Screen">
