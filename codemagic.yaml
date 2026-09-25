@@ -1,0 +1,51 @@
+# Lua Design iOS – unsigned UI smoke build.
+# This project intentionally creates ios/ only on the macOS Codemagic worker.
+# It does not sign an IPA, request secrets or access the production backend.
+workflows:
+  ios-ui-smoke:
+    name: Lua Design iOS – unsigned UI smoke build
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      node: "24"
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install pinned npm dependencies
+        script: npm ci
+      - name: Verify packaged preview assets
+        script: |
+          set -eu
+          test -s www/index.html
+          test -s www/assets/native-preview.js
+          test -s www/assets/controller-20260716a.css
+          test -s www/assets/capacitor-ios.css
+          test -s www/assets/qr-vendor-20260715a.js
+          test -s www/icons/LogoappXanh_512_20260515c.png
+      - name: Generate and sync iOS project on macOS
+        script: |
+          set -eu
+          if [ -d ios/App ]; then
+            npx cap sync ios
+          else
+            npx cap add ios
+          fi
+      - name: Build unsigned iOS app
+        script: |
+          set -eu
+          if [ -d ios/App/App.xcworkspace ]; then
+            xcodebuild -workspace ios/App/App.xcworkspace \
+              -scheme App -configuration Debug \
+              -destination 'generic/platform=iOS' \
+              -derivedDataPath "$CM_BUILD_DIR/build/ios-derived" \
+              CODE_SIGNING_ALLOWED=NO build
+          else
+            xcodebuild -project ios/App/App.xcodeproj \
+              -scheme App -configuration Debug \
+              -destination 'generic/platform=iOS' \
+              -derivedDataPath "$CM_BUILD_DIR/build/ios-derived" \
+              CODE_SIGNING_ALLOWED=NO build
+          fi
+    artifacts:
+      - build/ios-derived/Build/Products/Debug-iphoneos/*.app
+      - /tmp/xcodebuild_logs/*.log

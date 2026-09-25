@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lúa Design</title>
+
+  <meta name="theme-color" content="#f4f6fb" />
+  <meta name="lua-build" content="native-preview-offline" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/LogoappXanh_512_20260515c.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Lúa Design" />
+    <link rel="stylesheet" href="./assets/controller-20260716a.css" />
+  <link rel="stylesheet" href="./assets/capacitor-ios.css" />
+</head>
+<body>
+  <div class="wrap">
+    <section class="card topbar compact-topbar">
+      <div class="topbar-actions">
+        <div class="topbar-left"><img class="topbar-logo" src="./assets/lua-design-logo-20260715a.svg" alt="Lúa Design logo" /><span id="onlinePill" class="badge offline">Offline</span></div>
+        <div class="lang-switch" role="group" aria-label="Language selector">
+          <button class="btn lang-btn" id="langBtnVi" onclick="setLanguage('vi')"><svg class="flag-svg" viewBox="0 0 22 16" aria-hidden="true" focusable="false"><rect width="22" height="16" rx="3" fill="#DA251D"/><polygon points="11,3.2 12.6,8 17.6,8 13.5,10.9 15,15.5 11,12.7 7,15.5 8.5,10.9 4.4,8 9.4,8" fill="#FFDD00"/></svg><span>VI</span></button>
+          <button class="btn lang-btn" id="langBtnEn" onclick="setLanguage('en')"><svg class="flag-svg" viewBox="0 0 22 16" aria-hidden="true" focusable="false"><clipPath id="gbFlagClip"><rect width="22" height="16" rx="3"/></clipPath><g clip-path="url(#gbFlagClip)"><rect width="22" height="16" fill="#012169"/><path d="M0 0 L22 16 M22 0 L0 16" stroke="#FFF" stroke-width="4.2"/><path d="M0 0 L22 16 M22 0 L0 16" stroke="#C8102E" stroke-width="2.2"/><path d="M11 0 V16 M0 8 H22" stroke="#FFF" stroke-width="6"/><path d="M11 0 V16 M0 8 H22" stroke="#C8102E" stroke-width="3.2"/></g><rect width="22" height="16" rx="3" fill="none" stroke="rgba(15,23,42,0.08)"/></svg><span>EN</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="actionCard" style="display:none !important;"></section>
+
+    <section class="card hidden" id="entryCard" style="display:none !important;">
+      <div id="entryNotice" class="notice"></div>
+    </section>
+
+    <section class="card hidden device-switcher-card" id="deviceSwitcherCard">
+      <div class="device-switcher">
+        <div class="device-switcher-label" id="deviceSwitcherLabel">Thiết bị của bạn</div>
+        <div class="device-switcher-wrap">
+          <button
+            class="btn device-switcher-btn"
+            id="deviceSwitcherBtn"
+            type="button"
+            onclick="toggleDeviceSwitcherMenu()"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+          >
+            <span class="device-switcher-current" id="deviceSwitcherCurrent">Chọn thiết bị để điều khiển</span>
+            <span class="device-switcher-caret">▾</span>
+          </button>
+          <div class="device-switcher-menu hidden" id="deviceSwitcherMenu" role="presentation"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="controlCard">
+      <div class="section-head control-head">
+        <div class="control-head-main">
+          <div class="device-title-wrap">
+            <h2 class="section-title device-title" id="controlTitle">--</h2>
+            <button class="btn rename-device-btn" id="renameDeviceBtn" type="button" onclick="renameDeviceLabel()" aria-label="Đổi tên thiết bị" title="Đổi tên thiết bị">✏️</button>
+            <button class="btn customer-location-btn hidden" id="customerInfoBtn" type="button" onclick="toggleCustomerInfoPanel()" aria-label="Thông tin khách hàng" title="Thông tin khách hàng" aria-expanded="false">📍</button>
+          </div>
+          <div id="customerInfoPanel" class="customer-info-panel hidden" aria-live="polite"></div>
+          <div class="control-head-actions">
+            <button class="btn small primary ghost schedule-preset-btn" id="scheduleAutoPresetBtn" onclick="applyCloudAutoPreset()">⚡ Set lịch tự động</button>
+          </div>
+        </div>
+      </div>
+      <div id="sensorPanel" class="sensor-panel hidden"></div>
+      <div id="controlGrid" class="control-grid"></div>
+    </section>
+
+
+    <section class="card hidden" id="shareCard">
+      <div class="toolbar">
+        <button class="btn primary" onclick="createShareInvite()">Chia sẻ thiết bị</button>
+      </div>
+    </section>
+
+    <section id="shareModalBackdrop" class="share-modal-backdrop hidden" onclick="handleShareModalBackdrop(event)">
+      <div class="share-modal share-modal-qr-only" role="dialog" aria-modal="true" aria-label="QR chia sẻ thiết bị">
+        <div class="share-qr-caption">QR chia sẻ</div>
+        <div id="shareQrBox" class="share-qr-shell"></div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="clientsCard">
+      <div class="toolbar">
+        <button class="btn schedule-toggle-btn" id="clientsToggleBtn" onclick="toggleClientsPanel()">👥 Thiết bị đã được cấp quyền</button>
+      </div>
+      <div id="clientsPanel" class="channel-schedule-panel hidden">
+        <div id="clientsList" class="client-list"></div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="adminCard">
+      <div class="toolbar">
+        <button class="btn primary" id="adminShareBtn" onclick="createAdminShareInvite()">Chia sẻ quyền admin</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="adminClientsCard">
+      <div class="toolbar">
+        <button class="btn schedule-toggle-btn" id="adminClientsToggleBtn" onclick="toggleAdminClientsPanel()">🛡️ Máy quản trị đã được cấp quyền</button>
+      </div>
+      <div id="adminClientsPanel" class="channel-schedule-panel hidden">
+        <div id="adminClientsList" class="client-list"></div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="logCard" style="display:none !important;">
+      <div class="log-head">
+        <h2 class="section-title" style="margin:0;">Realtime log</h2>
+      </div>
+      <pre class="log-box" id="logBox"></pre>
+    </section>
+
+    <section class="card device-service-card hidden" id="serviceStatusCard">
+      <div class="device-service-row">
+        <div class="warranty-row hidden" id="maintenanceRow">
+          <span id="maintenanceLabelText">Bảo dưỡng:</span>
+          <span class="warranty-chip expired" id="maintenanceChip">Hết bảo dưỡng</span>
+        </div>
+        <div class="warranty-row hidden" id="warrantyRow">
+          <span id="warrantyLabelText">Bảo hành:</span>
+          <span class="warranty-chip expired" id="warrantyChip">Hết bảo hành</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="a2hsOverlay" class="a2hs-overlay" aria-hidden="true">
+    <div class="a2hs-card" role="dialog" aria-modal="true" aria-label="Add to Home Screen">
+      <div class="a2hs-steps" id="a2hsSteps"></div>
+      <button id="a2hsInstallBtn" type="button" class="btn primary a2hs-install-btn hidden">Cài app</button>
+    </div>
+  </section>
+
+  <script defer src="./assets/qr-vendor-20260715a.js"></script>
+
+  <script defer src="./assets/native-preview.js"></script>
+</body>
+</html>
